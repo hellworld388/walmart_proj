@@ -2,13 +2,13 @@
 -- DROP ALL TABLES FIRST
 -- ========================
 DROP TABLE IF EXISTS orders CASCADE;
-DROP TABLE IF EXISTS store_inventory CASCADE;
+DROP TABLE IF EXISTS supplier_inventory CASCADE;
 DROP TABLE IF EXISTS warehouse_inventory CASCADE;
 DROP TABLE IF EXISTS suppliers CASCADE;
-DROP TABLE IF EXISTS store_managers CASCADE;
 DROP TABLE IF EXISTS warehouses CASCADE;
 DROP TABLE IF EXISTS products CASCADE;
 DROP TABLE IF EXISTS transport_modes CASCADE;
+DROP TABLE IF EXISTS store_managers CASCADE;
 
 -- ========================
 -- 1. STORE MANAGERS
@@ -21,10 +21,10 @@ CREATE TABLE IF NOT EXISTS store_managers (
 );
 
 -- ========================
--- 2. SUPPLIERS (also act as STORES)
+-- 2. WAREHOUSES (now act as STORES)
 -- ========================
-CREATE TABLE IF NOT EXISTS suppliers (
-    supplier_id SERIAL PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS warehouses (
+    warehouse_id SERIAL PRIMARY KEY,
     name TEXT NOT NULL,
     latitude FLOAT,
     longitude FLOAT,
@@ -34,10 +34,10 @@ CREATE TABLE IF NOT EXISTS suppliers (
 );
 
 -- ========================
--- 3. WAREHOUSES
+-- 3. SUPPLIERS (now act as SUPPLY POINTS)
 -- ========================
-CREATE TABLE IF NOT EXISTS warehouses (
-    warehouse_id SERIAL PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS suppliers (
+    supplier_id SERIAL PRIMARY KEY,
     name TEXT NOT NULL,
     latitude FLOAT,
     longitude FLOAT,
@@ -57,12 +57,23 @@ CREATE TABLE IF NOT EXISTS products (
     weight FLOAT,
     dimensions TEXT,
     current_score FLOAT DEFAULT 0,
-    price FLOAT CHECK (price >= 0)  -- ✅ NEW COLUMN
+    price FLOAT CHECK (price >= 0)
 );
 
+-- ========================
+-- 5. INVENTORY (Supplier-level inventory; renamed)
+-- ========================
+CREATE TABLE IF NOT EXISTS supplier_inventory (
+    supplier_id INTEGER REFERENCES suppliers(supplier_id) ON DELETE CASCADE,
+    product_id INTEGER REFERENCES products(product_id) ON DELETE CASCADE,
+    current_stock INTEGER,
+    min_threshold INTEGER,
+    max_capacity INTEGER,
+    PRIMARY KEY (supplier_id, product_id)
+);
 
 -- ========================
--- 5. INVENTORY (Warehouse-level)
+-- 6. STORE INVENTORY (Warehouse/store-level; renamed)
 -- ========================
 CREATE TABLE IF NOT EXISTS warehouse_inventory (
     warehouse_id INTEGER REFERENCES warehouses(warehouse_id),
@@ -71,18 +82,6 @@ CREATE TABLE IF NOT EXISTS warehouse_inventory (
     min_threshold INTEGER,
     max_capacity INTEGER,
     PRIMARY KEY (warehouse_id, product_id)
-);
-
--- ========================
--- 6. STORE INVENTORY (Supplier/Store-level)
--- ========================
-CREATE TABLE IF NOT EXISTS store_inventory (
-    supplier_id INTEGER REFERENCES suppliers(supplier_id) ON DELETE CASCADE,
-    product_id INTEGER REFERENCES products(product_id) ON DELETE CASCADE,
-    current_stock INTEGER,
-    min_threshold INTEGER,
-    max_capacity INTEGER,
-    PRIMARY KEY (supplier_id, product_id)
 );
 
 -- ========================
@@ -105,5 +104,5 @@ CREATE TABLE IF NOT EXISTS orders (
     product_id INTEGER REFERENCES products(product_id) ON DELETE CASCADE,
     quantity INTEGER NOT NULL,
     order_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    transport_mode TEXT REFERENCES transport_modes(mode_type)  -- ✅ NEW COLUMN
+    transport_mode TEXT REFERENCES transport_modes(mode_type)
 );

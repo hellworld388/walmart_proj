@@ -9,8 +9,9 @@ import {
 } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import "../styles/MapPage.css";
 
-// Fix Leaflet icon path issue
+// Fix Leaflet icon paths
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl:
@@ -19,13 +20,12 @@ L.Icon.Default.mergeOptions({
   shadowUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png",
 });
 
-// Yellow supplier marker
+// Custom icons
 const yellowIcon = new L.Icon({
   iconUrl: "https://maps.google.com/mapfiles/ms/icons/yellow-dot.png",
   iconSize: [30, 30],
 });
 
-// Orange warehouse marker
 const orangeIcon = new L.Icon({
   iconUrl: "https://maps.google.com/mapfiles/ms/icons/orange-dot.png",
   iconSize: [30, 30],
@@ -40,7 +40,8 @@ function MapPage({ supplierCoords, warehouseCoords, transportMode, onBackToDashb
   useEffect(() => {
     if (!supplierCoords || !warehouseCoords || !transportMode) return;
 
-    const supplier_id = supplierCoords.id;
+    const supplier_id = supplierCoords.supplier_id;
+
     const warehouse_id = warehouseCoords.warehouse_id;
 
     axios
@@ -55,47 +56,34 @@ function MapPage({ supplierCoords, warehouseCoords, transportMode, onBackToDashb
   }, [supplierCoords, warehouseCoords, transportMode]);
 
   return (
-    <div>
-      <h2 style={{ textAlign: "center" }}>🚚 Delivery Route</h2>
+    <div className="map-wrapper">
+      <h2 className="map-title">🚚 Delivery Route</h2>
+
       {distance && (
-        <div style={{ textAlign: "center", fontWeight: "bold", marginBottom: 10 }}>
+        <div className="map-info">
           Distance: {distance} km | Duration: {duration} mins | Cost (₹): {cost}
         </div>
       )}
+
       <MapContainer
         center={[supplierCoords.lat, supplierCoords.lng]}
         zoom={6}
-        style={{ height: "75vh", width: "100%" }}
+        className="leaflet-map"
       >
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
-        {/* Supplier Marker */}
-        <Marker
-          position={[supplierCoords.lat, supplierCoords.lng]}
-          icon={yellowIcon}
-        >
-          <Popup>
-            <b>Supplier</b>
-          </Popup>
+        <Marker position={[supplierCoords.lat, supplierCoords.lng]} icon={yellowIcon}>
+          <Popup><b>Supplier</b></Popup>
         </Marker>
 
-        {/* Warehouse Marker */}
-        <Marker
-          position={[warehouseCoords.latitude, warehouseCoords.longitude]}
-          icon={orangeIcon}
-        >
-          <Popup>
-            <b>Warehouse:</b> {warehouseCoords.name}
-          </Popup>
+        <Marker position={[warehouseCoords.latitude, warehouseCoords.longitude]} icon={orangeIcon}>
+          <Popup><b>Warehouse:</b> {warehouseCoords.name}</Popup>
         </Marker>
 
-        {/* Route */}
-        {route.length > 0 && (
-          <Polyline positions={route} color="red" weight={5} />
-        )}
+        {route.length > 0 && <Polyline positions={route} color="red" weight={5} />}
       </MapContainer>
 
-      <div style={{ textAlign: "center", marginTop: 20 }}>
+      <div className="back-button-container">
         <button onClick={onBackToDashboard}>⬅️ Back to Dashboard</button>
       </div>
     </div>

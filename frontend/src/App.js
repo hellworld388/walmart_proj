@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import LoginPage from './LoginPage';
-import Dashboard from './Dashboard';
-import ReorderPage from './ReorderPage';
-import MapPage from './MapPage';
+import LoginPage from './components/LoginPage';
+import Dashboard from './components/Dashboard';
+import ReorderPage from './components/ReorderPage';
+import MapPage from './components/MapPage';
 
 function App() {
   const [manager, setManager] = useState(null);
@@ -44,6 +44,7 @@ function App() {
           product={selectedProduct}
           manager={manager}
           onOrderPlaced={handleOrderPlaced}
+          onCancel={handleBackToDashboard}
         />
       )}
 
