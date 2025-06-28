@@ -9,7 +9,10 @@ function ReorderPage({ product, manager, onOrderPlaced, onCancel }) {
   const [transportMode, setTransportMode] = useState('');
   const [quantity, setQuantity] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [suggestions, setSuggestions] = useState([]);
+  const [suggestionLoading, setSuggestionLoading] = useState(false);
 
+  // Fetch suppliers and transport modes once
   useEffect(() => {
     const fetchOptions = async () => {
       try {
@@ -27,6 +30,30 @@ function ReorderPage({ product, manager, onOrderPlaced, onCancel }) {
 
     fetchOptions();
   }, [product]);
+
+  const handleFetchSuggestions = async () => {
+    if (!supplierId || quantity < 1) {
+      alert("Please select a supplier and enter a valid quantity");
+      return;
+    }
+
+    try {
+      setSuggestionLoading(true);
+      const res = await axios.post('http://localhost:3000/suggest/suggest-modes', {
+        supplier_id: Number(supplierId),
+        warehouse_id: Number(manager.warehouse_id),
+        product_id: Number(product.product_id),
+        quantity: Number(quantity)
+      });
+      setSuggestions(res.data);
+    } catch (err) {
+      console.error("Suggestion error:", err);
+      alert("Failed to fetch suggestions.");
+      setSuggestions([]);
+    } finally {
+      setSuggestionLoading(false);
+    }
+  };
 
   const handleOrder = async () => {
     if (!supplierId || !transportMode || quantity < 1) {
@@ -113,6 +140,14 @@ function ReorderPage({ product, manager, onOrderPlaced, onCancel }) {
       </div>
 
       <div className="form-group">
+        <button onClick={handleFetchSuggestions} disabled={!supplierId || quantity < 1}>
+          🔍 Get Suggestions
+        </button>
+      </div>
+
+      {suggestionLoading && <p>Loading suggestions...</p>}
+
+      <div className="form-group">
         <label>🚛 Transport Mode</label>
         <select
           value={transportMode}
@@ -126,8 +161,27 @@ function ReorderPage({ product, manager, onOrderPlaced, onCancel }) {
             </option>
           ))}
         </select>
-        {transportModes.length === 0 && <p className="no-options">No transport modes configured.</p>}
       </div>
+
+      {suggestions?.modes?.length > 0 && (
+        <div className="suggestions-section">
+          {suggestions.modes.map((s, idx) => (
+            <div
+              key={idx}
+              className={`suggestion-card ${s.is_best ? 'highlight' : ''}`}
+              onClick={() => setTransportMode(s.mode)}
+              style={{ cursor: 'pointer' }}
+            >
+              <p><strong>Mode:</strong> {s.mode}</p>
+              <p><strong>Cost:</strong> ₹{s.estimated_cost}</p>
+              <p><strong>Distance:</strong> {s.distance_km} km</p>
+              <p><strong>Sustainability Score:</strong> {s.sustainability_score}</p>
+              {s.is_best && <p className="best-label">🌱 Best Option</p>}
+            </div>
+          ))}
+        </div>
+      )}
+
 
       <div className="reorder-buttons">
         <button onClick={handleOrder} disabled={loading}>
