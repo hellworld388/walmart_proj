@@ -1,0 +1,21 @@
+Database Setup:
+The user runs the SQL scripts in db_setup (schema.sql and data.sql) to set up the database before starting the backend.
+Environment Variables:
+
+change password and create a .env file in your backend with the following infor: 
+DB_USER=postgres
+DB_HOST=localhost
+DB_NAME=supplydb
+DB_PASS=sarvesh12
+DB_PORT=5432
+PORT=4000
+
+
+another thing is to run the setup.bat create supplydb database and then update password wherever necessary. 
+Dependencies:
+The user runs npm install in both customer_backend and customer_frontend to install dependencies.
+Start Order:
+Start the backend (npm start or node server.js in customer_backend).
+Start the frontend (npm start in customer_frontend).
+CORS/Ports:
+The frontend and backend should be configured to communicate (e.g., backend runs on port 4000, frontend on 3000).
