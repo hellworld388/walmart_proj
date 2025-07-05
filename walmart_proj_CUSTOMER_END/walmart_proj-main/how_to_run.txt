@@ -1,21 +1,182 @@
-Database Setup:
-The user runs the SQL scripts in db_setup (schema.sql and data.sql) to set up the database before starting the backend.
-Environment Variables:
+# 🚀 How to Run Walmart Customer Platform with AI Integration
 
-change password and create a .env file in your backend with the following infor: 
-DB_USER=postgres
-DB_HOST=localhost
-DB_NAME=supplydb
-DB_PASS=sarvesh12
-DB_PORT=5432
-PORT=4000
+## 📋 Prerequisites
+- Node.js (v14 or higher)
+- PostgreSQL (v12 or higher)
+- Google Gemini API Key
 
+## 🔑 Get Google Gemini API Key
+1. Visit [Google AI Studio](https://makersuite.google.com/app/apikey)
+2. Sign in with your Google account
+3. Click "Create API Key"
+4. Copy the generated API key
+5. Keep it secure - you'll need it for the backend
 
-another thing is to run the setup.bat create supplydb database and then update password wherever necessary. 
-Dependencies:
-The user runs npm install in both customer_backend and customer_frontend to install dependencies.
-Start Order:
-Start the backend (npm start or node server.js in customer_backend).
-Start the frontend (npm start in customer_frontend).
-CORS/Ports:
-The frontend and backend should be configured to communicate (e.g., backend runs on port 4000, frontend on 3000).
+## 🗄️ Database Setup
+
+### Option 1: Automated Setup (Windows)
+1. Navigate to `db_setup` folder
+2. Double-click `setup.bat`
+3. Enter your PostgreSQL password when prompted
+
+### Option 2: Manual Setup
+1. Open PostgreSQL command line or pgAdmin
+2. Create database: `CREATE DATABASE walmart_customer;`
+3. Run `db_setup/schema.sql` to create tables
+4. Run `db_setup/data.sql` to populate data
+
+## 🔧 Backend Setup
+
+1. Navigate to `customer_backend` folder
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Configure environment variables:
+   ```bash
+   # Copy the config file
+   cp config.env .env
+   
+   # Edit .env with your credentials:
+   # GEMINI_API_KEY=your_gemini_api_key_here
+   # DB_HOST=localhost
+   # DB_PORT=5432
+   # DB_NAME=walmart_customer
+   # DB_USER=postgres
+   # DB_PASSWORD=your_password
+   ```
+
+4. Start the backend server:
+   ```bash
+   npm start
+   ```
+   
+   Server will run on: http://localhost:4000
+
+## 🎨 Frontend Setup
+
+1. Navigate to `customer_frontend` folder
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Start the frontend server:
+   ```bash
+   npm start
+   ```
+   
+   App will open on: http://localhost:3000
+
+## 🧪 Testing the AI Integration
+
+### 1. Login to the Platform
+- Use any customer credentials from the database
+- Or register a new account
+
+### 2. Test AI Chatbot
+- Click the 🤖 button in the bottom-right corner
+- Try these example queries:
+
+**Recipe Shopping:**
+```
+"Make me pancakes with 200 rupees budget"
+"I want to cook pasta for dinner"
+"Need ingredients for chocolate cake"
+```
+
+**Post-Activity Nutrition:**
+```
+"I need snacks after football practice"
+"Energy boost after gym workout"
+"Recovery food after tennis"
+```
+
+**Clothing Recommendations:**
+```
+"Blue trousers size 32 under 500 rupees"
+"Casual shirt for office under 300 rupees"
+"Formal wear for interview"
+```
+
+**Health & Wellness:**
+```
+"Healthy protein snacks for muscle building"
+"Organic food for weight loss"
+"Vitamin-rich fruits and vegetables"
+```
+
+### 3. AI Features to Test
+- **Budget Optimization**: Set a budget and see AI suggestions
+- **Sustainability Priority**: Toggle the 🌱 checkbox
+- **Context Understanding**: Ask follow-up questions
+- **Product Recommendations**: Click "Add to Cart" on AI suggestions
+
+## 🔍 Troubleshooting
+
+### Backend Issues
+- **Database Connection**: Check PostgreSQL is running
+- **API Key**: Verify GEMINI_API_KEY is set correctly
+- **Port Conflicts**: Change PORT in .env if 4000 is busy
+
+### Frontend Issues
+- **CORS Errors**: Ensure backend is running on port 4000
+- **API Calls**: Check browser console for network errors
+- **React Errors**: Clear browser cache and restart
+
+### AI Service Issues
+- **API Limits**: Check Gemini API usage limits
+- **Network**: Ensure stable internet connection
+- **Fallback**: System will use basic recommendations if AI fails
+
+## 📊 Expected Behavior
+
+### AI Responses Should Include:
+- Personalized greeting and context understanding
+- Relevant product recommendations with prices
+- Total cost calculation
+- Sustainability scoring
+- Reasoning for recommendations
+- Budget optimization suggestions
+
+### Example AI Response:
+```
+"Perfect! For your pancake recipe with a 200 rupee budget, I recommend:
+- All-Purpose Flour (₹45) - Essential for fluffy pancakes
+- Fresh Eggs (₹60) - For binding and texture
+- Fresh Milk (₹40) - For smooth batter
+- Butter (₹55) - For cooking and flavor
+
+Total Cost: ₹200
+Sustainability Score: 78%
+These ingredients will make 8-10 delicious pancakes!"
+```
+
+## 🎯 Success Indicators
+
+✅ Backend server starts without errors
+✅ Frontend loads and shows product catalog
+✅ AI chatbot responds to natural language queries
+✅ Product recommendations are relevant and within budget
+✅ Sustainability scores are displayed
+✅ "Add to Cart" functionality works with AI suggestions
+
+## 🆘 Need Help?
+
+1. Check the console logs for error messages
+2. Verify all environment variables are set correctly
+3. Ensure PostgreSQL database is properly configured
+4. Confirm Google Gemini API key is valid and has quota
+
+## 🚀 Next Steps
+
+Once everything is working:
+1. Explore different shopping scenarios
+2. Test budget constraints and sustainability preferences
+3. Try complex queries with multiple requirements
+4. Experiment with the AI's context understanding
+
+---
+
+**Enjoy your AI-powered shopping experience! 🛒🤖**

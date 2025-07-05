@@ -6,7 +6,7 @@ const db = require("../db");
 router.get("/:customer_id", async (req, res) => {
   const { customer_id } = req.params;
   const result = await db.query(
-    `SELECT c.id, c.product_id, p.name, p.price, p.stock, c.quantity
+    `SELECT c.id, c.product_id, p.name, p.price, p.stock, p.image_url, p.recyclability_index, c.quantity
      FROM cart c JOIN products p ON c.product_id = p.product_id
      WHERE c.customer_id = $1`,
     [customer_id]
@@ -42,6 +42,32 @@ router.delete("/:customer_id/:product_id", async (req, res) => {
     product_id,
   ]);
   res.json({ success: true });
+});
+
+// Update item quantity in cart
+router.put("/:customer_id/:product_id", async (req, res) => {
+  const { customer_id, product_id } = req.params;
+  const { quantity } = req.body;
+  
+  try {
+    if (quantity <= 0) {
+      // If quantity is 0 or negative, remove the item
+      await db.query("DELETE FROM cart WHERE customer_id=$1 AND product_id=$2", [
+        customer_id,
+        product_id,
+      ]);
+    } else {
+      // Update the quantity
+      await db.query(
+        "UPDATE cart SET quantity = $1 WHERE customer_id = $2 AND product_id = $3",
+        [quantity, customer_id, product_id]
+      );
+    }
+    res.json({ success: true });
+  } catch (err) {
+    console.error("Update cart quantity error:", err);
+    res.status(500).json({ error: "Failed to update cart quantity" });
+  }
 });
 
 // Checkout (move cart to orders) with delivery vehicle and cost
